@@ -33,7 +33,7 @@ pipeline {
 		stage('SonarQube Analysis') {
 			steps{
 				withSonarQubeEnv(‘sonar’) {
-	            	sh ‘’’ $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BoardGame -Dsonar.projectKey=BoardGame -Dsonar.java.binaries=. ‘’’
+	            	sh ‘’’ $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=give_your_project_name -Dsonar.projectKey=same_as_project_name -Dsonar.java.binaries=. ‘’’
 			}
 		}
 		stage('Quality Gate') {
