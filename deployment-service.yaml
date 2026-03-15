@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: project_name
-          image: mrunalmpatil555/boardgame:latest # Image that will be used to containers in the cluster
+          image: mrunalmpatil555/image_name:tag # Image that will be used to containers in the cluster
           imagePullPolicy: Always
           ports:
             - containerPort: 8080 # The port that the container is running on in the cluster
