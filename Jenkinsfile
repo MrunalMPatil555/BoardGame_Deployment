@@ -25,14 +25,22 @@ pipeline {
 				sh "mvn test"
 			}
 		}
+		stage('File system scan') {
+			steps{
+			       sh “trivy fs –format table trivy-fs-report.html .”	
+			}
+		}
 		stage('SonarQube Analysis') {
 			steps{
-
+				withSonarQubeEnv(‘sonar’) {
+	            	sh ‘’’ $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BoardGame -Dsonar.projectKey=BoardGame -Dsonar.java.binaries=. ‘’’
 			}
 		}
 		stage('Quality Gate') {
 			steps{
-
+				script{
+			       waitForQualityGate abortPipeline: false, credentialsId: ‘sonar-token’	
+                }
 			}
 		}
 		stage('Build') {
@@ -42,7 +50,9 @@ pipeline {
 		}
 		stage('Publish To Nexus') {
 			steps{
-				sh "mvn deploy"
+				withMaven(globalMavenSettingsConfig: ‘global-settings’, jdk: ‘jdk17’, maven: ‘maven3’, mavenSettingsConfig:”, traceability: true) {
+					sh "mvn deploy"
+				}
 			}
 		}
 		stage('Build & Tag Docker Image') {
