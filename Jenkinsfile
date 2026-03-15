@@ -34,7 +34,9 @@ pipeline {
 			steps{
 				withSonarQubeEnv(‘sonar’) {
 	            	sh ‘’’ $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=give_your_project_name -Dsonar.projectKey=same_as_project_name -Dsonar.java.binaries=. ‘’’
-			}
+			
+				}
+		    }
 		}
 		stage('Quality Gate') {
 			steps{
@@ -57,17 +59,21 @@ pipeline {
 		}
 		stage('Build & Tag Docker Image') {
 			steps{
-				sh "docker build -t username/app:latest ."
-			}
+				script{
+			      withDockerRegistry(credentialsId: ‘docker-cred’, toolName: ‘docker’) {
+						sh "docker build -t username/image_name:tag ."
+				  }
+			    }
+		    }  
 		}
 		stage('Docker Image Scan') {
 			steps{
-				sh "trivy image --format table -o trivy-di-report.html username/app:latest"
+				sh "trivy image --format table -o trivy-image-report.html username/image_name:tag"
 			}
 		}
 		stage('Push Docker Image') {
 			steps{
-				sh "docker push username/app:latest"
+				sh "docker push docker_hub_username/image_name:tag"
 			}
 		}
 		stage('Deploy to Kubernetes') {
